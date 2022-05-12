@@ -1,13 +1,22 @@
 import * as C from './App.styles'
 import {useState} from 'react'
 import {Item} from './types/Item'
+import { ThemeProvider } from 'styled-components'
+import light from './themes/light'
+import dark from './themes/dark'
+import GlobalStyle from './global'
 import ListItem from './components/listitem'
 import AddArea from './components/addarea'
+import  Button from './components/themebutton'
+import usePersistedState from './util/usePersistedState'
+
 const App = () => {
-  const [list, setList] = useState<Item[]>([
-    {id: 1, name: 'Comprar o pão na padaria', done: false},
-    {id: 2, name: 'Comprar a padaria no pão', done: true}
-  ]);
+  const [list, setList] = useState<Item[]>([]);
+  const [theme, setTheme] = usePersistedState('theme', light);
+
+  const toggleTheme = () => {
+    setTheme(theme.title === 'light' ? dark : light);
+  }
 
   const handleAddTask = (taskName : string) => {
     let newList = [...list];
@@ -19,10 +28,13 @@ const App = () => {
     setList(newList)
   }
   return(
+    <ThemeProvider theme={theme}>
     <C.Container>
+      <GlobalStyle/>
       <C.Area>
         <C.Header>
           Lista de Tarefas
+          <Button toggleTheme={toggleTheme}/>
         </C.Header>
 
         {list.map((item, index)=>(
@@ -32,6 +44,7 @@ const App = () => {
         <AddArea onEnter={handleAddTask}/>
       </C.Area>
     </C.Container>
+    </ThemeProvider>
   )
 }
 
